@@ -5,8 +5,8 @@
 //#define _FILENAME "dump_ultra_small.cap"
 
 int main(int argc, char** argv) {
-    int32_t sysinfo[6], header[4];
-    size_t buffsize;
+    int32_t gHeader[6], pHeader[4];
+    unsigned char *pData;
     if (argc != 2) {
         printf("Usage: tcpsesscount filename\n");
     //    return 0; // uncomment before release
@@ -18,18 +18,17 @@ int main(int argc, char** argv) {
         return 0;
     }
     
-    for (int i = 0, sz = fread(sysinfo, sizeof(sysinfo[0]), 6, dump); i < sz; ++i) {
-        printf("%X ", sysinfo[i]);
+    for (size_t i = 0, gHeaderSize = fread(gHeader, sizeof(gHeader[0]), 6, dump); i < gHeaderSize; ++i) {
+        printf("%X ", gHeader[i]);
     }
     printf("\n");
     int c = 0;
-    unsigned char *data = NULL;
-    while (fread(header, sizeof(header[0]), 4, dump)) {
-        data = (unsigned char*) malloc(header[2] * sizeof(unsigned char));
-        fread(data, sizeof(data[0]), header[2], dump);
+    while (fread(pHeader, sizeof(pHeader[0]), 4, dump)) {
+        pData = (unsigned char*) malloc(pHeader[2] * sizeof(unsigned char));
+        fread(pData, sizeof(pData[0]), pHeader[2], dump);
         c++;
-        free(data);
+        free(pData);
     }
-    printf("Number of pockets: %d\n", c);
+    printf("Number of packets: %d\n", c);
     return 0;
 }
