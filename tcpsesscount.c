@@ -5,7 +5,7 @@
 //#define _FILENAME "dump_ultra_small.cap"
 
 typedef struct {
-    int32_t mac_src[5], mac_dst[5];
+    unsigned char mac_src[6], mac_dst[6];
     u_int16_t port_src, port_dst;
 } tcpPacketData;
 
@@ -47,7 +47,12 @@ int main(int argc, char** argv) {
         pData = (unsigned char*) malloc(pHeader[2] * sizeof(unsigned char)); // Might be faster than realloc(pData, pHeader[2])
         fread(pData, sizeof(pData[0]), pHeader[2], dump);
         tcpPacket = parseTCP(pData);
-        // printf("%i -> %i, ", tcpPacket.port_src, tcpPacket.port_dst);
+        for(int i = 0; i < 6; ++i)
+            printf("%X ", tcpPacket.mac_src[i]);
+        printf(": %i -> ", tcpPacket.port_src);
+        for(int i = 0; i < 6; ++i)
+            printf("%X ", tcpPacket.mac_dst[i]);
+        printf(": %i\n", tcpPacket.port_dst);
         free(pData);
     }
     return 0;
