@@ -2,16 +2,23 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#define _FILENAME "rb919.cap"
+#include "flags.h"
+//#define _FILENAME "rb919.cap"
 //#define _FILENAME "dump_ultra_small.cap"
+#define _FILENAME "dump_ncat_1sess.cap"
 
 typedef struct {
     unsigned char mac_src[6], mac_dst[6];
-    u_int16_t port_src, port_dst;
+    uint16_t port_src, port_dst;
     char ipv;
+    tcpFlag flag;
 } tcpPacketData;
 
-tcpPacketData parseTCP(unsigned char *d, const u_int16_t *etype) {
+tcpPacketData parseTCP(unsigned char *d, const uint16_t *etype) {
+    /*
+    * HELLO HANDSHAKE: SYN-> SYN/ACK<- ACK->
+    * GOODBYE HANDSHAKE: FIN/ACK-> FIN/ACK<- ACK-> 
+    */
     tcpPacketData tcp;
     for (size_t i = 6; i < 12; ++i) {
         tcp.mac_src[i - 6] = d[i];
@@ -22,6 +29,7 @@ tcpPacketData parseTCP(unsigned char *d, const u_int16_t *etype) {
     tcp.port_src = (d[34] << 8) + d[35];
     tcp.port_dst = (d[36] << 8) + d[37];
     tcp.ipv = 4 + 2 * (*etype != 0x0800);
+    fillflag(&tcp.flag, tcp.ipv == 4 ? d[47] : d[51]);
     return tcp;
 }
 
@@ -32,13 +40,15 @@ void printInfo(const tcpPacketData *tp) {
     printf(": %i -> ", tp->port_src);
     for(int i = 0; i < 6; ++i)
         printf("%X ", tp->mac_dst[i]);
-    printf(": %i\n", tp->port_dst);
+    printf(": %i ", tp->port_dst);
+    printf("| FIN:%i SYN:%i RST:%i PSH:%i ACK:%i URG:%i", tp->flag.FIN, tp->flag.SYN, tp->flag.RST, tp->flag.PSH, tp->flag.ACK, tp->flag.URG);
+    printf("\n");
 }
 
 int main(int argc, char** argv) {
     const size_t gHeaderSize = 6, pHeaderSize = 4;
     int32_t gHeader[gHeaderSize], pHeader[pHeaderSize];
-    u_int16_t eth_type;
+    uint16_t eth_type;
     unsigned char *pData;
     tcpPacketData tcpPacket;
     if (argc != 2) {
