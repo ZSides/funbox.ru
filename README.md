@@ -17,6 +17,7 @@ gcc tcpsesscount.c -O2 -o tcpsesscount
 [Подробнее](https://github.com/hokiespurs/velodyne-copter/wiki/PCAP-format "PCAP format")
 ### Handshake
 Приветственное рукопожатие - SYN на сервер, SYN/ACK на клиент, ACK на сервер
+
 Прощальное рукопожатие - FIN/ACK на сервер, FIN/ACK на клиент, ACK на сервер
 
 ## Пояснения по коду
@@ -24,4 +25,5 @@ gcc tcpsesscount.c -O2 -o tcpsesscount
 TODO
 ### flags.h
 Содержит структуру для хранения флагов.
+
 Содержит функцию для заполнения структуры.
