@@ -3,13 +3,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "flags.h"
-#include "storage.h"
+#include "library.h"
 #include "tcppacketdata.h"
 //#define _FILENAME "rb919.cap"
 //#define _FILENAME "dump_ultra_small.cap"
 #define _FILENAME "dump_ncat_1sess.cap"
-
-
 
 tcpPacketData parseTCP(uint8_t *d, const uint16_t *etype) {
     tcpPacketData tcp;
@@ -32,32 +30,14 @@ tcpPacketData parseTCP(uint8_t *d, const uint16_t *etype) {
     return tcp;
 }
 
-void printInfo(const tcpPacketData *tp) {
-    printf("IPv%i. ", tp->ipv);
-    for(int32_t i = 0; i < 6; ++i)
-        printf((i != 5 ? "%X:" : "%X "), tp->mac_src[i]);
-    printf("-> ");
-    for(int32_t i = 0; i < 6; ++i)
-        printf((i != 5 ? "%X:" : "%X "), tp->mac_dst[i]);
-    printf("| ");
-    for (int32_t i = 0; i < 4; ++i)
-        printf((i != 3 ? "%d." : "%d"), tp->ip_src[i]);
-    printf(":%i -> ", tp->port_src);
-    for (int32_t i = 0; i < 4; ++i)
-        printf((i != 3 ? "%d." : "%d"), tp->ip_dst[i]);
-    printf(":%i ", tp->port_dst);
-    printf("| FIN:%i SYN:%i RST:%i PSH:%i ACK:%i URG:%i | ", tp->flag.FIN, tp->flag.SYN, tp->flag.RST, tp->flag.PSH, tp->flag.ACK, tp->flag.URG);
-    printf("\n");
-}
-
 int main(int argc, char** argv) {
     const size_t gHeaderSize = 6, pHeaderSize = 4;
     int32_t gHeader[gHeaderSize], pHeader[pHeaderSize];
     uint16_t eth_type;
     uint8_t *pData;
     tcpPacketData tcpPacket;
-    storage strg;
-    storage_init(&strg);
+    library lib;
+    library_init(&lib);
     if (argc != 2) {
         printf("Usage: tcpsesscount filename\n");
     //    return 0; // uncomment before release
@@ -65,10 +45,9 @@ int main(int argc, char** argv) {
     FILE *dump = fopen(_FILENAME, "rb");
 
     if (dump == NULL) {
-        printf("Can't open file %s\n", _FILENAME);
-        return 0;
+        return (printf("Can't open file %s\n", _FILENAME), 0);
     }
-    
+
     fread(gHeader, sizeof(gHeader[0]), gHeaderSize, dump);
     for (size_t i = 0; i < gHeaderSize; ++i) printf("%X(Integer: %d) ", gHeader[i], gHeader[i]);
     printf("\n");
@@ -78,10 +57,10 @@ int main(int argc, char** argv) {
         eth_type = (pData[12] << 8) + pData[13];
         if ((pData[23] == 6) && (eth_type == 0x0800)) {
             tcpPacket = parseTCP(pData, &eth_type);
-            printInfo(&tcpPacket);
+            library_push(&lib, tcpPacket);
         }
-        storage_push(&strg, tcpPacket);
         free(pData);
     }
+    library_print(&lib);
     return 0;
 }
