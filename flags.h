@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct {
     bool FIN, SYN, RST, PSH, ACK, URG;
 } tcpFlag;
