@@ -4,11 +4,8 @@
 #include <stdbool.h>
 #include "flags.h"
 #include "library.h"
+#include "analysis.h"
 #include "tcppacketdata.h"
-#define _FILENAME "dump.cap"
-//#define _FILENAME "rb919.cap"
-//#define _FILENAME "dump_ultra_small.cap"
-//#define _FILENAME "dump_ncat_1sess.cap"
 
 tcpPacketData parseTCP(uint8_t *d, const uint16_t *etype) {
     tcpPacketData tcp;
@@ -40,18 +37,17 @@ int main(int argc, char** argv) {
     library lib;
     library_init(&lib);
     if (argc != 2) {
-        printf("Usage: tcpsesscount filename\n");
-    //    return 0; // uncomment before release
+        return (printf("Usage: tcpsesscount filename\n")), 0;
     }
-    FILE *dump = fopen(_FILENAME, "rb");
+    FILE *dump = fopen(argv[1], "rb");
 
     if (dump == NULL) {
-        return (printf("Can't open file %s\n", _FILENAME), 0);
+        return (printf("Can't open file %s\n", argv[1]), 0);
     }
 
     fread(gHeader, sizeof(gHeader[0]), gHeaderSize, dump);
-    for (size_t i = 0; i < gHeaderSize; ++i) printf("%X(Integer: %d) ", gHeader[i], gHeader[i]);
-    printf("\n");
+    //for (size_t i = 0; i < gHeaderSize; ++i) printf("%X(Integer: %d) ", gHeader[i], gHeader[i]);
+    //printf("\n");
     while (fread(pHeader, sizeof(pHeader[0]), pHeaderSize, dump)) {
         pData = (uint8_t*) malloc(pHeader[2] * sizeof(uint8_t)); // Might be faster than realloc(pData, pHeader[2])
         fread(pData, sizeof(pData[0]), pHeader[2], dump);
@@ -62,9 +58,8 @@ int main(int argc, char** argv) {
         }
         free(pData);
     }
-    library_print(&lib);
-    // analyze(&lib);
-
+    // library_print(&lib);
+    analysis(&lib);
     library_clear(&lib);
     free(lib.storageArray);
     fclose(dump);

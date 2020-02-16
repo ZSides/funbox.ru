@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdint.h>
 #include "flags.h"
 #include "tcppacketdata.h"
@@ -72,6 +74,7 @@ void storage_clear(storage *strg) {
 
 void storage_print(storage *strg, uint64_t from, uint64_t to) {
     for(; from < to; ++from) {
+        printf("%i) ", from);
         printInfo(&strg->tcpArray[from]);
     }
 }
