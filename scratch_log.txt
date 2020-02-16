@@ -1,5 +1,0 @@
-A1B2C3D4(Integer: -1582119980) 40002(Integer: 262146) 0(Integer: 0) 0(Integer: 0) 40000(Integer: 262144) 1(Integer: 1) 
-Closed regularly: 0
-Closed abnormally: 0
-Unclosed: 2
-Total: 2

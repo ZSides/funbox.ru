@@ -1,5 +1,7 @@
 # Что делает данная утилита?
 Анализирует бинарные файлы с результатом выполнения утилиты tcpdump и выводит количество незавершенных сессий, завершенных штатно и нештатно.
+
+Задача решена в рамках отбора в funbox.ru. [Текст условия](https://funbox.ru/q/c.pdf)
 ## Пример использования
 ```
 tcpdump -w FILENAME.cap
@@ -13,8 +15,6 @@ cd funbox.ru
 gcc tcpsesscount.c -O2 -o tcpsesscount
 ```
 
-# Справочная информация
-## Технические детали
 ### Структура дампа
 (global header | packet header | packet data | packet header | packet data | packet header | ... | packet data)
 [Подробнее](https://github.com/hokiespurs/velodyne-copter/wiki/PCAP-format "PCAP format")
@@ -22,12 +22,4 @@ gcc tcpsesscount.c -O2 -o tcpsesscount
 Приветственное рукопожатие - SYN на сервер, SYN/ACK на клиент, ACK на сервер
 
 Прощальное рукопожатие - FIN/ACK на сервер, FIN/ACK на клиент, ACK на сервер
-
-## Пояснения по коду
-### main.c
-TODO
-### flags.h
-Содержит структуру для хранения флагов.
-
-Содержит функцию для заполнения данной структуры.
 
