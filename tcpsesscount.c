@@ -65,11 +65,8 @@ int main(int argc, char** argv) {
     library_print(&lib);
     // analyze(&lib);
 
-    for (uint64_t i = 0, sz = lib.current_size; i < sz; ++i) {
-        for (uint64_t j = 0, s = lib.storageArray[i].current_size; j < s; ++j) {
-            free(lib.storageArray[i].tcpArray);
-        }
-    }
+    library_clear(&lib);
     free(lib.storageArray);
+    fclose(dump);
     return 0;
 }

@@ -61,6 +61,15 @@ tcpPacketData storage_pop(storage *strg) {
     return strg->tcpArray[strg->current_size--];
 }
 
+void storage_destroy(storage *strg) {
+    free(strg->tcpArray);
+}
+
+void storage_clear(storage *strg) {
+    storage_destroy(strg);
+    storage_init(strg);
+}
+
 void storage_print(storage *strg, uint64_t from, uint64_t to) {
     for(; from < to; ++from) {
         printInfo(&strg->tcpArray[from]);
@@ -136,5 +145,11 @@ void library_print(library *lib) {
     for (uint64_t i = 0, s = lib->current_size; i < s; ++i) {
         printf("Block #%d:\n", i);
         storage_print_a(&lib->storageArray[i]);
+    }
+}
+
+void library_clear(library *lib) {
+    for(int64_t i = 0, s = lib->current_size; i < s; ++i) {
+        storage_destroy(&lib->storageArray[i]);
     }
 }
