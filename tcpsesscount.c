@@ -5,9 +5,10 @@
 #include "flags.h"
 #include "library.h"
 #include "tcppacketdata.h"
+#define _FILENAME "dump.cap"
 //#define _FILENAME "rb919.cap"
 //#define _FILENAME "dump_ultra_small.cap"
-#define _FILENAME "dump_ncat_1sess.cap"
+//#define _FILENAME "dump_ncat_1sess.cap"
 
 tcpPacketData parseTCP(uint8_t *d, const uint16_t *etype) {
     tcpPacketData tcp;
@@ -62,5 +63,13 @@ int main(int argc, char** argv) {
         free(pData);
     }
     library_print(&lib);
+    // analyze(&lib);
+
+    for (uint64_t i = 0, sz = lib.current_size; i < sz; ++i) {
+        for (uint64_t j = 0, s = lib.storageArray[i].current_size; j < s; ++j) {
+            free(lib.storageArray[i].tcpArray);
+        }
+    }
+    free(lib.storageArray);
     return 0;
 }
